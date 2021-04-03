@@ -31,7 +31,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ? SingleChildScrollView(
                 child: Column(
                   children: <Widget>[
-                    Text("Hello SOME_NAME!"),
+                    Text(
+                      "Hello ${_authUser.username}!",
+                    ),
                   ],
                 ),
               )

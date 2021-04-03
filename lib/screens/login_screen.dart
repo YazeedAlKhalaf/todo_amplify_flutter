@@ -1,20 +1,19 @@
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:flutter/material.dart';
-import 'package:todo_amplify/screens/confirm_sign_up_screen.dart';
-import 'package:todo_amplify/screens/login_screen.dart';
+import 'package:todo_amplify/screens/home_screen.dart';
+import 'package:todo_amplify/screens/register_screen.dart';
 import 'package:todo_amplify/services/auth_service.dart';
 
-class RegisterScreen extends StatefulWidget {
+class LoginScreen extends StatefulWidget {
   @override
-  _RegisterScreenState createState() => _RegisterScreenState();
+  _LoginScreenState createState() => _LoginScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _LoginScreenState extends State<LoginScreen> {
   final AuthService _authService = AuthService();
 
-  final GlobalKey<FormState> _registerFormKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
 
-  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
@@ -27,32 +26,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
   }
 
-  Future<void> registerUser() async {
+  Future<void> loginUser() async {
     final username = _usernameController.text.trim();
-    final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (_registerFormKey.currentState.validate()) {
+    if (_loginFormKey.currentState.validate()) {
       setIsBusy(true);
-      final dynamic result = await _authService.registerUser(
+      final dynamic result = await _authService.loginUser(
         username: username,
-        email: email,
         password: password,
       );
       setIsBusy(false);
 
-      if (result is SignUpResult) {
-        if (result.isSignUpComplete) {
-          print("Sign Up Successful! ${result.nextStep.signUpStep}");
-          switch (result.nextStep.signUpStep) {
-            case "CONFIRM_SIGN_UP_STEP":
+      if (result is SignInResult) {
+        if (result.isSignedIn) {
+          print("Sign In Successful! ${result.nextStep.signInStep}");
+          switch (result.nextStep.signInStep) {
+            case "DONE":
               await Navigator.pushAndRemoveUntil(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => ConfirmSignUpScreen(
-                    username: username,
-                  ),
-                ),
+                MaterialPageRoute(builder: (_) => HomeScreen()),
                 (route) => false,
               );
               break;
@@ -78,7 +71,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 isBusy ? LinearProgressIndicator() : SizedBox.shrink(),
                 const SizedBox(height: 20),
                 Text(
-                  "Register",
+                  "Login",
                   style: TextStyle(
                     fontSize: 45,
                     fontWeight: FontWeight.bold,
@@ -86,32 +79,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 20),
                 Form(
-                  key: _registerFormKey,
+                  key: _loginFormKey,
                   autovalidateMode: autoValidate
                       ? AutovalidateMode.onUserInteraction
                       : AutovalidateMode.disabled,
                   child: Column(
                     children: <Widget>[
-                      TextFormField(
-                        controller: _emailController,
-                        keyboardType: TextInputType.emailAddress,
-                        decoration: InputDecoration(
-                          labelText: "Email",
-                          border: OutlineInputBorder(),
-                        ),
-                        validator: (String value) {
-                          final String trimmedValue = value.trim();
-
-                          if (trimmedValue == "")
-                            return "Email cannot be empty!";
-
-                          if (!trimmedValue.contains("@"))
-                            return "Email must be correct!";
-
-                          return null;
-                        },
-                      ),
-                      const SizedBox(height: 10),
                       TextFormField(
                         controller: _usernameController,
                         keyboardType: TextInputType.name,
@@ -176,12 +149,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           Expanded(
                             child: ElevatedButton(
                               onPressed: () async {
-                                await registerUser();
+                                await loginUser();
                               },
                               child: Padding(
                                 padding: const EdgeInsets.all(15),
                                 child: Text(
-                                  "Register",
+                                  "Login",
                                   style: TextStyle(
                                     fontSize: 18,
                                   ),
@@ -196,12 +169,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         onTap: () async {
                           await Navigator.pushAndRemoveUntil(
                             context,
-                            MaterialPageRoute(builder: (_) => LoginScreen()),
+                            MaterialPageRoute(builder: (_) => RegisterScreen()),
                             (route) => false,
                           );
                         },
                         child: Text(
-                          "Already have an account? Login!",
+                          "Have no account? Register!",
                           style: TextStyle(
                             color: Colors.blueAccent,
                             fontSize: 15,

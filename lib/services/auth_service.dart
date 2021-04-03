@@ -50,4 +50,22 @@ class AuthService {
 
     return authUser;
   }
+
+  Future<SignInResult> loginUser({
+    @required String username,
+    @required String password,
+  }) async {
+    try {
+      final SignInResult signInResult = await Amplify.Auth.signIn(
+        username: username,
+        password: password,
+      );
+
+      return signInResult;
+    } on AuthException catch (e) {
+      print(e.message);
+
+      return null;
+    }
+  }
 }
