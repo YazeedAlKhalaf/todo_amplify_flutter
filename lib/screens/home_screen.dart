@@ -73,15 +73,22 @@ class _HomeScreenState extends State<HomeScreen> {
                                 final Todo todo = _todoList[index];
                                 return ListTile(
                                   title: Text(todo.name),
-                                  trailing: IconButton(
-                                    icon: Icon(
-                                      todo.done
-                                          ? Icons.check_rounded
-                                          : Icons.close_rounded,
-                                      color:
-                                          todo.done ? Colors.green : Colors.red,
-                                    ),
-                                    onPressed: () {},
+                                  subtitle: Text(todo.description.length > 30
+                                      ? todo.description.substring(0, 30) +
+                                          '...'
+                                      : todo.description),
+                                  trailing: Checkbox(
+                                    value: todo.done,
+                                    onChanged: (bool newValue) async {
+                                      await _dataStoreService.updateTodo(
+                                        id: todo.id,
+                                        name: todo.name,
+                                        description: todo.description,
+                                        done: newValue,
+                                      );
+
+                                      await getTodos();
+                                    },
                                   ),
                                 );
                               },

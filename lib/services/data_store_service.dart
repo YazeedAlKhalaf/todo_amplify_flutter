@@ -50,4 +50,31 @@ class DataStoreService {
       return null;
     }
   }
+
+  Future<void> updateTodo({
+    @required String id,
+    @required String name,
+    @required String description,
+    @required bool done,
+  }) async {
+    try {
+      final Todo oldTodo = (await _amplifyDataStore.query(
+        Todo.classType,
+        where: Todo.ID.eq(id),
+      ))[0];
+
+      final Todo newTodo = oldTodo.copyWith(
+        id: oldTodo.id,
+        name: name,
+        description: description,
+        done: done,
+      );
+
+      await _amplifyDataStore.save(newTodo);
+    } on DataStoreException catch (e) {
+      print('Query failed: $e');
+
+      return null;
+    }
+  }
 }
