@@ -2,7 +2,9 @@ import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
 import 'package:amplify_flutter/amplify.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_amplify/amplifyconfiguration.dart';
+import 'package:todo_amplify/screens/home_screen.dart';
 import 'package:todo_amplify/screens/register_screen.dart';
+import 'package:todo_amplify/services/auth_service.dart';
 
 void main() {
   runApp(MyApp());
@@ -31,6 +33,8 @@ class StartupScreen extends StatefulWidget {
 }
 
 class _StartupScreenState extends State<StartupScreen> {
+  final AuthService _authService = AuthService();
+
   bool _amplifyConfigured = false;
 
   @override
@@ -54,13 +58,30 @@ class _StartupScreenState extends State<StartupScreen> {
         _amplifyConfigured = true;
       });
 
+      await _authService.getCurrentUser().then((AuthUser authUser) async {
+        if (authUser != null) {
+          await Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => HomeScreen()),
+            (route) => false,
+          );
+        } else {
+          await Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => RegisterScreen()),
+            (route) => false,
+          );
+        }
+      });
+    } on AmplifyAlreadyConfiguredException catch (exception) {
+      print("Amplify was already configured. Was the app restarted?");
+    } on SignedOutException catch (exception) {
+      print("Amplify Signed Out Exception: $exception");
       await Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => RegisterScreen()),
         (route) => false,
       );
-    } on AmplifyAlreadyConfiguredException catch (exception) {
-      print("Amplify was already configured. Was the app restarted?");
     } on AmplifyException catch (exception) {
       print("Amplify Exception: $exception");
     }

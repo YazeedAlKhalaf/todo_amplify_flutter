@@ -44,4 +44,10 @@ class AuthService {
       return null;
     }
   }
+
+  Future<AuthUser> getCurrentUser() async {
+    final AuthUser authUser = await Amplify.Auth.getCurrentUser();
+
+    return authUser;
+  }
 }
