@@ -77,4 +77,8 @@ class DataStoreService {
       return null;
     }
   }
+
+  Future<void> clearLocalDataStore() async {
+    await _amplifyDataStore.clear();
+  }
 }

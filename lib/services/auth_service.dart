@@ -68,4 +68,10 @@ class AuthService {
       return null;
     }
   }
+
+  Future<SignOutResult> signOut() async {
+    final SignOutResult signOutResult = await Amplify.Auth.signOut();
+
+    return signOutResult;
+  }
 }
