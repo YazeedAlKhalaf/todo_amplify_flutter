@@ -1,7 +1,10 @@
+import 'package:amplify_api/amplify_api.dart';
 import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+import 'package:amplify_datastore/amplify_datastore.dart';
 import 'package:amplify_flutter/amplify.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_amplify/amplifyconfiguration.dart';
+import 'package:todo_amplify/models/ModelProvider.dart';
 import 'package:todo_amplify/screens/home_screen.dart';
 import 'package:todo_amplify/screens/register_screen.dart';
 import 'package:todo_amplify/services/auth_service.dart';
@@ -51,6 +54,10 @@ class _StartupScreenState extends State<StartupScreen> {
     try {
       /// Add Cognito Plugin.
       await Amplify.addPlugin(AmplifyAuthCognito());
+      await Amplify.addPlugin(
+        AmplifyDataStore(modelProvider: ModelProvider.instance),
+      );
+      Amplify.addPlugin(AmplifyAPI());
 
       await Amplify.configure(amplifyconfig);
 
